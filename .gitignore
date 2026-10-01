@@ -1,0 +1,36 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+
+# Runtime data and private uploads
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/cache/*
+!/storage/cache/.gitkeep
+/storage/uploads/*
+!/storage/uploads/.gitkeep
+
+# Local tools and generated files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+php-lint-results.txt
+*.log
+*.dump
+*.bak
+*.zip
+
+# Local database diagnostic page
+/public/db-test.php
+
+CREATE_FINANCE_ACCOUNT_STANDALONE.bat
+scripts/create_finance_officer.php

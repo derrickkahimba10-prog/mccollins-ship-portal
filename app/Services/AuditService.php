@@ -1,0 +1,7 @@
+<?php
+declare(strict_types=1);namespace App\Services;
+use App\Config\Database;use RuntimeException;
+final class AuditService{
+ public static function events(string$q=''):array{if(!Auth::can('AUDIT_VIEW_ALL'))throw new RuntimeException('Audit permission required.');$sql="SELECT ae.*,u.display_name actor_name,COALESCE(ae.action_code,JSON_UNQUOTE(JSON_EXTRACT(ae.metadata_json,'$.action_code'))) resolved_action,COALESCE(ae.entity_type,JSON_UNQUOTE(JSON_EXTRACT(ae.metadata_json,'$.entity_type'))) resolved_entity FROM audit_events ae LEFT JOIN users u ON u.user_id=COALESCE(ae.actor_user_id,ae.created_by_user_id) WHERE ae.status='active'";$params=[];if($q!==''){$sql.=" AND(ae.action_code LIKE ? OR ae.metadata_json LIKE ? OR u.display_name LIKE ?)";$params=array_fill(0,3,'%'.$q.'%');}$sql.=" ORDER BY ae.created_at DESC,ae.audit_event_id DESC LIMIT 300";$s=Database::connection()->prepare($sql);$s->execute($params);return$s->fetchAll();}
+ public static function access():array{if(!Auth::can('ACCESS_LOG_VIEW'))throw new RuntimeException('Access-log permission required.');return Database::connection()->query("SELECT al.*,u.display_name FROM access_logs al LEFT JOIN users u ON u.user_id=al.user_id WHERE al.status='active' ORDER BY al.occurred_at DESC LIMIT 300")->fetchAll();}
+}

@@ -1,0 +1,1 @@
+<?php declare(strict_types=1);require_once __DIR__.'/../bootstrap/app.php';use App\Services\Auth;use App\Support\Url;header('Location: '.(Auth::check()?Url::to('dashboard.php'):Url::to('auth/login.php')));exit;

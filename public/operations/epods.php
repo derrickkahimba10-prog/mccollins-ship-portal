@@ -1,0 +1,6 @@
+<?php declare(strict_types=1);require_once __DIR__.'/../../bootstrap/app.php';use App\Services\Auth;use App\Services\DocumentEpodService;use App\Support\Url;Auth::requirePermission('EPOD_REVIEW_OPERATIONS');$rows=DocumentEpodService::operationsQueue();$pageTitle='Documents & e-POD';require BASE_PATH.'/app/Views/layout/header.php';?>
+<div class="page-head"><div><h1>Documents & e-POD</h1><p>Review transport documents and electronic proof of delivery.</p></div><span class="badge">Phase 10</span></div>
+<div class="card table-wrap"><table><thead><tr><th>Trip</th><th>Shipment</th><th>Load</th><th>Route</th><th>Trip status</th><th>e-POD</th><th></th></tr></thead><tbody>
+<?php foreach($rows as$r):?><tr><td><?=h($r['trip_ref'])?></td><td><?=h($r['shipment_ref'])?></td><td><?=h($r['load_ref'])?></td><td><?=h($r['origin_city'].' → '.$r['destination_city'])?></td><td><span class="status-pill status-<?=h($r['current_status'])?>"><?=h(str_replace('_',' ',$r['current_status']))?></span></td><td><?=h($r['epod_status']??'not submitted')?></td><td><a href="<?=h(Url::to('documents/trip.php?id='.$r['trip_id']))?>">Open</a></td></tr><?php endforeach;?>
+<?php if(!$rows):?><tr><td colspan="7" class="muted">No delivered shipments are awaiting e-POD work.</td></tr><?php endif;?></tbody></table></div>
+<?php require BASE_PATH.'/app/Views/layout/footer.php';?>

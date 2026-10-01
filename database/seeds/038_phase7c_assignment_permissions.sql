@@ -1,0 +1,11 @@
+USE mccollins_shipping;
+SET time_zone = '+00:00';
+START TRANSACTION;
+INSERT INTO permissions(permission_code,domain_code,action_code,sensitivity,is_active) SELECT 'ASSIGNMENT_QUEUE_VIEW','assignment','queue_view','sensitive',1 WHERE NOT EXISTS(SELECT 1 FROM permissions WHERE permission_code='ASSIGNMENT_QUEUE_VIEW');
+INSERT INTO permissions(permission_code,domain_code,action_code,sensitivity,is_active) SELECT 'ASSIGNMENT_CREATE','assignment','create','sensitive',1 WHERE NOT EXISTS(SELECT 1 FROM permissions WHERE permission_code='ASSIGNMENT_CREATE');
+INSERT INTO permissions(permission_code,domain_code,action_code,sensitivity,is_active) SELECT 'ASSIGNMENT_VIEW_ALL','assignment','view_all','sensitive',1 WHERE NOT EXISTS(SELECT 1 FROM permissions WHERE permission_code='ASSIGNMENT_VIEW_ALL');
+INSERT INTO permissions(permission_code,domain_code,action_code,sensitivity,is_active) SELECT 'ASSIGNMENT_VIEW_OWN','assignment','view_own','normal',1 WHERE NOT EXISTS(SELECT 1 FROM permissions WHERE permission_code='ASSIGNMENT_VIEW_OWN');
+INSERT INTO role_permissions(role_id,permission_id,scope_class,effective_from,status) SELECT r.role_id,p.permission_id,'global',UTC_TIMESTAMP(6),'active' FROM roles r JOIN permissions p ON p.permission_code IN('ASSIGNMENT_QUEUE_VIEW','ASSIGNMENT_CREATE','ASSIGNMENT_VIEW_ALL') WHERE r.role_code='MCCOLLIN_OPERATIONS' AND r.is_active=1 AND NOT EXISTS(SELECT 1 FROM role_permissions rp WHERE rp.role_id=r.role_id AND rp.permission_id=p.permission_id AND rp.status='active');
+INSERT INTO role_permissions(role_id,permission_id,scope_class,effective_from,status) SELECT r.role_id,p.permission_id,'owner',UTC_TIMESTAMP(6),'active' FROM roles r JOIN permissions p ON p.permission_code='ASSIGNMENT_VIEW_OWN' WHERE r.role_code='TRUCK_OWNER' AND r.is_active=1 AND NOT EXISTS(SELECT 1 FROM role_permissions rp WHERE rp.role_id=r.role_id AND rp.permission_id=p.permission_id AND rp.status='active');
+COMMIT;
+SELECT permission_code FROM permissions WHERE permission_code LIKE 'ASSIGNMENT_%' ORDER BY permission_code;

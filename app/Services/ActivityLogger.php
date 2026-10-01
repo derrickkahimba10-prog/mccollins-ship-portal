@@ -1,0 +1,4 @@
+<?php
+declare(strict_types=1);namespace App\Services;
+use App\Config\Database;use App\Support\Reference;
+final class ActivityLogger{public static function request():void{if(PHP_SAPI==='cli'||!Auth::check())return;try{$p=Database::connection();$path=substr((string)($_SERVER['REQUEST_URI']??''),0,512);$agent=substr((string)($_SERVER['HTTP_USER_AGENT']??''),0,500);$ip=substr((string)($_SERVER['REMOTE_ADDR']??''),0,64);$meta=json_encode(['session_id'=>session_id()],JSON_THROW_ON_ERROR);$p->prepare("INSERT INTO access_logs(access_log_ref,user_id,request_method,request_path,ip_address,user_agent,occurred_at,metadata_json,status,created_by_user_id)VALUES(?,?,?,?,?,?,UTC_TIMESTAMP(6),?,'active',?)")->execute([Reference::make('ACL'),(int)Auth::user()['id'],$_SERVER['REQUEST_METHOD']??'GET',$path,$ip,$agent,$meta,(int)Auth::user()['id']]);}catch(\Throwable){}}}
